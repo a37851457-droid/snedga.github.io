@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Снежа, и ваш пушистый друг 🐾</title>
+    <style>
+        :root {
+            /* ===== НЕОНОВАЯ ПАЛИТРА ===== */
+            --neon-pink: #ed8bd9;
+            --neon-blue: #00e5ff;
+            --primary-color: #e8e8f0;
+            --accent-color: var(--neon-pink);
+            --glass-bg: rgba(221, 114, 219, 0.234);
+            --glass-border: rgba(72, 72, 231, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #eee;
+            /* Тёмный фон + розовое и синее неоновое свечение */
+            background:
+                radial-gradient(ellipse at 15% 20%, rgba(238, 109, 212, 0.25) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 80%, rgba(0, 229, 255, 0.25) 0%, transparent 50%),
+                linear-gradient(135deg, #0f0c29 0%, #1b1b3a 50%, #24243e 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* ===== Шапка-стекло с неоном ===== */
+        header {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--glass-border);
+            /* Неоновая светящаяся линия снизу: розово-синий градиент */
+            box-shadow: 0 4px 25px rgba(255, 47, 214, 0.35), 0 -2px 25px rgba(0, 229, 255, 0.2);
+            color: var(--primary-color);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            /* Неоновое свечение текста */
+            color: #fff;
+            text-shadow:
+                0 0 8px rgba(255, 47, 214, 0.9),
+                0 0 20px rgba(0, 229, 255, 0.6);
+        }
+        nav a {
+            color: #dcdcf5;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        nav a:hover {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+        }
+
+        main { max-width: 960px; margin: 30px auto; padding: 0 20px; }
+
+        /* ===== Секции-стекло с неоновой рамкой ===== */
+        section {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.35),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+        /* Градиентная неоновая полоска сверху каждой секции */
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            box-shadow: 0 0 10px rgba(255, 47, 214, 0.7), 0 0 10px rgba(0, 229, 255, 0.7);
+        }
+        section h2 {
+            margin-bottom: 20px;
+            border-bottom: 2px solid transparent;
+            border-image: linear-gradient(90deg, var(--neon-pink), var(--neon-blue)) 1;
+            display: inline-block;
+            padding-bottom: 8px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 47, 214, 0.6);
+        }
+
+        /* ===== Форма истории ===== */
+        .snow-form textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            border: 2px solid rgba(0, 229, 255, 0.5);
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            margin-bottom: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .snow-form textarea::placeholder { color: rgba(255, 255, 255, 0.45); }
+        .snow-form textarea:focus {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 12px rgba(255, 47, 214, 0.5);
+        }
+
+        /* Панель хозяйки — видна только при адресе с #admin */
+        .admin-panel { display: none; }
+        body.admin .admin-panel { display: block; }
+
+        .admin-panel label {
+            font-weight: bold;
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .admin-panel input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed rgba(0, 229, 255, 0.5);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+        .admin-note {
+            background: rgba(255, 47, 214, 0.12);
+            border: 1px solid var(--neon-pink);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 47, 214, 0.3);
+        }
+
+        .snow-form button {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            color: #0f0c29;
+            font-weight: 700;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(255, 47, 214, 0.5), 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+        .snow-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 47, 214, 0.8), 0 0 25px rgba(0, 229, 255, 0.6);
+        }
+        .snow-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== Карточки историй (неоновое стекло) ===== */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .post-card {
+            background-color: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 3px solid var(--neon-pink);
+            border-radius: 12px;
+            padding: 20px;
+            animation: fadeIn 0.6s ease-out;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 229, 255, 0.1);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 47, 214, 0.35);
+        }
+        .post-card img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: block;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+        }
+        .post-card p { margin-bottom: 10px; word-wrap: break-word; color: #f0f0f8; }
+        .post-card small {
+            display: block;
+            text-align: right;
+            color: rgba(0, 229, 255, 0.7);
+            font-size: 13px;
+        }
+
+        /* ===== Галерея ===== */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+        .gallery-item img:hover {
+            transform: scale(1.03);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 47, 214, 0.6), 0 0 20px rgba(0, 229, 255, 0.4);
+        }
+
+        /* ===== Статус ===== */
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .status-ok {
+            background: rgba(0, 229, 255, 0.12);
+            border: 1px solid rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+        }
+        .status-error {
+            background: rgba(255, 47, 100, 0.15);
+            border: 1px solid #ff3366;
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
+        }
+
+        /* ===== Подвал (тёмное неоновое стекло) ===== */
+        footer {
+            background-color: rgba(15, 12, 41, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #c9c9e8;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-radius: 12px;
+            box-shadow: 0 -4px 20px rgba(0, 229, 255, 0.1);
+        }
+                /* Поля формы питомца — те же неоново-стеклянные */
+        .pet-form input,
+        .pet-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(0, 229, 255, 0.5);
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            margin-bottom: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .pet-form textarea { height: 70px; }
+        .pet-form input::placeholder,
+        .pet-form textarea::placeholder { color: rgba(255, 255, 255, 0.45); }
+        .pet-form input:focus,
+        .pet-form textarea:focus {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 12px rgba(255, 47, 214, 0.5);
+        }
+        .pet-form label {
+            font-weight: bold;
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .pet-form button {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            color: #0f0c29;
+            font-weight: 700;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(255, 47, 214, 0.5), 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+        .pet-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 47, 214, 0.8), 0 0 25px rgba(0, 229, 255, 0.6);
+        }
+        /* Второстепенная кнопка «скопировать почту» */
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        .btn-ghost:hover {
+            background: rgba(0, 229, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            nav a { display: block; margin: 10px 0; }
+            header h1 { font-size: 20px; }
+            section { padding: 20px; }
+        }
+</style>
+</head>
+<body>
+
+    <header>
+        <h1>Снежа и ваш пушистый друг 🐾</h1>
+        <nav>
+            <a href="#home">Главная</a>
+            <a href="#stories">Истории</a>
+            <a href="#gallery">Галерея</a>
+            <a href="#sendpet">Отправить питомца</a>
+
+        </nav>
+    </header>
+
+    <main>
+        <section id="home">
+            <h2>Добро пожаловать!</h2>
+            <p>Делись своими историями о питомцах— их увидят все посетители сайта!</p>
+            <p style="margin-top: 10px;">Фото Снежи — в галерее ниже. для того чтобы выложили фотографии ваших питомцов, их нужно отправить на почту (ниже) 📸</p>
+            <a href="#stories" style="display:inline-block; background:linear-gradient(90deg, var(--neon-pink), var(--neon-blue)); color:#0f0c29; font-weight:700; padding:12px 24px; text-decoration:none; border-radius:8px; margin-top:10px;">К историям</a>
+        </section>
+
+        <section id="stories">
+            <h2>Истории  📖</h2>
+
+            <div id="db-status" class="status-box status-ok">Подключение к базе данных...</div>
+
+            <div class="snow-form">
+                <p>Расскажите, что сегодня делал ваш питомец:</p>
+                <textarea id="postText" placeholder="Например: «Снежа сегодня устроила засаду на свой хвост!»"></textarea>
+
+                <div class="admin-panel">
+                    <div class="admin-note">
+                        🔑 Режим хозяйки включён. Можно прикрепить фото к истории.
+                    </div>
+                    <label for="postImage">Фото Снежи (необязательно):</label>
+                    <input type="file" id="postImage" accept="image/*" />
+                </div>
+
+                <button type="button" onclick="addPost()" id="submit-btn">Опубликовать историю</button>
+            </div>
+
+            <h3 style="margin-top: 30px; color: #fff; text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);">Лента историй (видят все):</h3>
+            <div class="posts-grid" id="posts-container">
+                <p style="grid-column: 1/-1; text-align: center; color: #b9b9d9; padding: 40px;">Загрузка историй из базы данных...</p>
+            </div>
+        </section>
+
+        <section id="gallery">
+            <h2>Галерея фото Снежи 📸</h2>
+            <p style="margin-bottom: 15px;">Здесь появляются все фото, которые добавляет хозяйка Снежи.</p>
+            <div class="gallery-grid" id="gallery-container">
+                <p style="grid-column: 1/-1; text-align: center; color: #b9b9d9; padding: 20px;">Пока фото нет. Загляните позже!</p>
+            </div>
+        </section>
+                <!-- Раздел: отправить питомца -->
+        <section id="sendpet">
+            <h2>Пришли фото своего питомца ✉️</h2>
+            <p style="margin-bottom: 15px;">
+                Расскажи о своём пушистом (или не очень) друге! Заполни форму, нажми «Отправить» —
+                откроется почта с готовым письмом. Прикрепи фото прямо в почте и отправляй!
+            </p>
+            <div class="pet-form">
+                <label for="petName">Кличка питомца:</label>
+                <input type="text" id="petName" placeholder="Например: Барсик" />
+
+                <label for="petWho">Кто вы питомцу:</label>
+                <input type="text" id="petWho" placeholder="Например: Аня, хозяйка" />
+
+                <label for="petMsg">Расскажите о нём:</label>
+                <textarea id="petMsg" placeholder="Например: Барсик обожает спать на клавиатуре, когда я работаю..."></textarea>
+
+                <button type="button" onclick="sendPetEmail()" id="pet-btn">📨 Отправить на почту</button>
+                <button type="button" class="btn-ghost" onclick="copyEmail()">Скопировать почту</button>
+            </div>
+            <p id="copy-status" style="margin-top: 10px; color: var(--neon-blue); display: none;">
+                Почта скопирована! Вставьте её в свою почтовую программу и пришлите письмо с фото 🐾
+            </p>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Снежа. Сайт создан с любовью. 🐾</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCrEHnZG9qBiyD5l32ojGtden_jgnTWp4",
+            authDomain: "snedga1.firebaseapp.com",
+            databaseURL: "https://snedga1-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "snedga1",
+            storageBucket: "snedga1.firebasestorage.app",
+            messagingSenderId: "464660688984",
+            appId: "1:464660688984:web:b05f3c159d1c96764d9a2d"
+        };
+
+        const statusEl = document.getElementById('db-status');
+        const submitBtn = document.getElementById('submit-btn');
+        let isReady = false;
+
+        // ===== РЕЖИМ ХОЗЯЙКИ =====
+        // Фото можно добавить только если адрес страницы заканчивается на #admin
+        const isAdmin = window.location.hash.includes('admin');
+        if (isAdmin) {
+            document.body.classList.add('admin');
+        }
+                // ===== ПОЧТА ХОЗЯЙКИ =====
+        const OWNER_EMAIL = "alice.pyurko@mail.ru"; // ← ВПИШИ СЮДА СВОЙ АДРЕС!
+        // =========================
+
+        // Отправка письма о питомце
+        window.sendPetEmail = function() {
+            const name = document.getElementById("petName").value.trim();
+            const who = document.getElementById("petWho").value.trim();
+            const msg = document.getElementById("petMsg").value.trim();
+
+            if (!name || !msg) {
+                alert("Заполните хотя бы кличку питомца и рассказ о нём!");
+                return;
+            }
+
+            const subject = "Фото питомца для Снежи: " + name;
+            const body =
+                "Привет! Это письмо с сайта про Снежу.\n\n" +
+                "Питомца зовут: " + name + "\n" +
+                (who ? "Пишет: " + who + "\n" : "") +
+                "\nРассказ:\n" + msg + "\n\n" +
+                "(Фото прикрепляю к этому письму)";
+
+            window.location.href = "mailto:" + OWNER_EMAIL +
+                "?subject=" + encodeURIComponent(subject) +
+                "&body=" + encodeURIComponent(body);
+
+            alert("Откроется ваша почта с готовым письмом. Не забудьте прикрепить фото питомца! 🐾");
+        };
+
+        // Копирование почты в буфер обмена
+        window.copyEmail = function() {
+            navigator.clipboard.writeText(OWNER_EMAIL)
+                .then(() => {
+                    const el = document.getElementById('copy-status');
+                    el.style.display = 'block';
+                    setTimeout(() => { el.style.display = 'none'; }, 4000);
+                })
+                .catch(() => {
+                    alert("Не удалось скопировать. Почта хозяйки: " + OWNER_EMAIL);
+                });
+        };
+
+
+        // Сжатие фото перед сохранением (чтобы база не переполнялась)
+        function compressImage(file, maxSize = 1000, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let { width, height } = img;
+                        if (width > maxSize || height > maxSize) {
+                            const scale = Math.min(maxSize / width, maxSize / height);
+                            width = Math.round(width * scale);
+                            height = Math.round(height * scale);
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = event.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            const postsRef = ref(db, "posts");
+
+            statusEl.className = "status-box status-ok";
+            statusEl.innerText = "✅ База данных подключена! Истории видны всем.";
+            isReady = true;
+
+            // Отправка истории
+            window.addPost = async function() {
+                if (!isReady) return alert("База данных не готова!");
+
+                const text = document.getElementById("postText").value.trim();
+                if (!text) {
+                    alert("Пожалуйста, напишите текст истории!");
+                    return;
+                }
+
+                let photoData = null;
+                const fileInput = document.getElementById("postImage");
+
+                if (isAdmin && fileInput && fileInput.files.length > 0) {
+                    try {
+                        photoData = await compressImage(fileInput.files[0]);
+                    } catch (e) {
+                        console.error("Ошибка обработки фото:", e);
+                        alert("Не удалось обработать фото. Попробуйте другое.");
+                        return;
+                    }
+                }
+
+                submitBtn.disabled = true;
+                try {
+                    const postData = { text: text, date: new Date().toLocaleString('ru-RU') };
+                    if (photoData) postData.photo = photoData;
+
+                    await push(postsRef, postData);
+                    document.getElementById("postText").value = "";
+                    if (fileInput) fileInput.value = "";
+                    alert("История опубликована! 🎉");
+                } catch (error) {
+                    console.error("Ошибка записи:", error);
+                    alert("Ошибка при публикации. Проверьте правила Firebase (Rules).");
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            };
+
+            // Чтение и отображение историй + галереи
+            onValue(postsRef, (snapshot) => {
+                const container = document.getElementById("posts-container");
+                const gallery = document.getElementById("gallery-container");
+                container.innerHTML = "";
+                gallery.innerHTML = "";
+
+                if (snapshot.hasChildren()) {
+                    const entries = Object.entries(snapshot.val());
+                    let hasPhotos = false;
+
+                    // Новые истории сверху
+                    entries.reverse().forEach(([, post]) => {
+                        const card = document.createElement("div");
+                        card.className = "post-card";
+
+                        const p = document.createElement("p");
+                        p.textContent = post.text;
+                        card.appendChild(p);
+
+                        if (post.photo) {
+                            const img = document.createElement("img");
+                            img.src = post.photo;
+                            img.alt = "Фото Снежи";
+                            card.appendChild(img);
+
+                            // Фото также попадает в галерею
+                            hasPhotos = true;
+                            const gItem = document.createElement("div");
+                            gItem.className = "gallery-item";
+                            const gImg = document.createElement("img");
+                            gImg.src = post.photo;
+                            gImg.alt = "Снежа";
+                            gItem.appendChild(gImg);
+                            gallery.appendChild(gItem);
+                        }
+
+                        const small = document.createElement("small");
+                        small.textContent = "📅 " + post.date;
+                        card.appendChild(small);
+
+                        container.appendChild(card);
+                    });
+
+                    if (!hasPhotos) {
+                        gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #b9b9d9; padding: 20px;'>Фото пока нет. Загляните позже!</p>";
+                    }
+                } else {
+                    container.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #b9b9d9; padding: 40px;'>Пока нет историй. Будьте первым!</p>";
+                    gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #b9b9d9; padding: 20px;'>Фото пока нет. Загляните позже!</p>";
+                }
+            }, (error) => {
+                console.error("Ошибка чтения:", error);
+                statusEl.className = "status-box status-error";
+                statusEl.innerText = "❌ Ошибка доступа к данным. Проверьте правила (Rules) в Firebase!";
+                submitBtn.disabled = true;
+            });
+
+        } catch (e) {
+            console.error("Критическая ошибка Firebase:", e);
+            statusEl.className = "status-box status-error";
+            statusEl.innerText = "❌ Не удалось загрузить Firebase. Проверьте интернет или консоль.";
+            submitBtn.disabled = true;
+        }
+
+        // Плавная прокрутка для меню
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
